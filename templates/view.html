@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head lang='en'>
+        <meta charset="utf-8">
+        <title>Stocks</title>
+        <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <link type="text/css" rel="stylesheet" href="../static/style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script>
+            var js_data;
+            function extract(vars) {
+                return vars;
+            }
+            console.log(js_data);
+        </script>
+        <script>
+            js_data = extract({{data|tojson}});
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="jumbotron"><h1>View Stock Data</h1></div>
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/">Home</a></li>
+                        <li class="active"><a href="/view/{{identity}}">View</a></li>
+                        <li><a href="/forum/{{identity}}">Forum</a></li>
+                        <li><a href="/access/{{identity}}">Admin</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/reg">Register</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div>
+                <form method="post">
+                    <div class="form-group">
+                        <label for="symbol">Symbol:</label>
+                        <input id="symbol" name="symbol" type="text" class="form-input" placeholder="Enter stock symbol">
+                    </div>
+                    <button class="btn btn-default" type="submit">submit</button>
+                </form>
+            </div>
+            <br>
+            <p><strong>Name: </strong>{{name}}</p>
+            {% if display %}
+                <div class="alert alert-danger">{{msg}}</div>
+            {% endif %}
+            <canvas id="chart"></canvas>
+            <div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Open</th>
+                            <th>High</th>
+                            <th>Low</th>
+                            <th>Close</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in data %}
+                            <tr>
+                                <td>{{d['month']}}-{{d['day']}}-{{d['year']}}</td>
+                                <td>{{d['open']}}</td>
+                                <td>{{d['high']}}</td>
+                                <td>{{d['low']}}</td>
+                                <td>{{d['close']}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            var xs = [];
+            var ys = [];
+            for (var i = 0; i < js_data.length; i++) {
+                xs.push(js_data[i].index);
+                ys.push(js_data[i].open);
+            }
+            console.log(xs);
+            console.log(ys);
+
+            new Chart("chart", {
+              type: "line",
+              data: {
+                labels: xs,
+                datasets: [{
+                  fill: false,
+                  lineTension: 0,
+                  backgroundColor: "rgba(0,0,255,1.0)",
+                  borderColor: "rgba(0,0,255,0.1)",
+                  data: ys
+                }]
+              },
+              options: {
+                legend: {display: false}
+              }
+            });
+        </script>
+    </body>
+</html>

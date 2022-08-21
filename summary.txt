@@ -1,0 +1,44 @@
+Web App Functionality:
+    - stock price live + history displays
+    - forum
+    - simulator
+    - simulator leaderboard (change, net, breakdown)
+    - Mobile-compatible JSON APIs
+
+Mobile App Functionality:
+    - 10-day streak
+    - forum
+    - simulator quick buy/sell
+    - simulator leaderboard quick view
+
+
+Forum Comment-Thread JSON Object:
+
+JSON: {title: '',
+    count: 0,
+    date: 0,
+    comments: [{title, user, time, text, subs}]
+
+Thread: {
+    title: '',
+    count: 0,
+    date: 0,
+    comments: [
+        ids
+    ]
+}
+
+Comments: {
+    user: '',
+    time: 0,
+    text: 0,
+    is_sub: T/F,
+    subcomments: [ids],
+    likes: 0,
+    dislikes: 0
+}
+
+stock data object format:
+
+{index, day, month, year, open, closed, high, low}
+

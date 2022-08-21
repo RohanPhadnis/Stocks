@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head lang='en'>
+        <meta charset="utf-8">
+        <title>Stocks</title>
+        <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <link type="text/css" rel="stylesheet" href="../static/style.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="jumbotron"><h1>View Stock Data</h1></div>
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/view/{{identity}}">View</a></li>
+                        <li><a href="/forum/{{identity}}">Forum</a></li>
+                        <li class="active"><a href="/access/{{identity}}">Admin</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/reg">Register</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div>
+                <h2>Users</h2>
+                <table class="table table-bordered">
+                    <thead></thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Delete</th>
+                        </tr>
+                    <tbody>
+                        {% for i in users %}
+                            <tr>
+                                <td>{{i['name']}}</td>
+                                <td>{{i['email']}}</td>
+                                <td>{{i['user']}}</td>
+                                <td>
+                                    <a href="/delete/{{identity}}/user/{{i['_id']}}">
+                                        <button class="btn btn-default" style="color:red">x</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            <div>
+                <h2>Session</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Time</th>
+                            <th>IP Address</th>
+                            <th>Admin</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in sessions %}
+                            <tr>
+                                <td>{{i['user']}}</td>
+                                <td>{{i['time']}}</td>
+                                <td>{{i['ip']}}</td>
+                                <td>{{i['admin']}}</td>
+                                <td>
+                                    <a href="/delete/{{identity}}/session/{{i['_id']}}">
+                                        <button class="btn btn-default" style="color:red">x</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            <div>
+                <h2>Threads</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Thread Number</th>
+                            <th>Title</th>
+                            <th>Date and Time</th>
+                            <th>Number of Comments</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in threads %}
+                            <tr>
+                                <td>{{i}}</td>
+                                <td>{{i['title']}}</td>
+                                <td>{{i['time']}}</td>
+                                <td>{{i['num']}}</td>
+                                <td>
+                                    <a href="/delete/{{identity}}/thread/{{i['_id']}}">
+                                        <button class="btn btn-default" style="color:red">x</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            <div>
+                <h2>Comments</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Thread Number</th>
+                            <th>Text</th>
+                            <th>User</th>
+                            <th>Date and Time</th>
+                            <th>Likes</th>
+                            <th>Dislikes</th>
+                            <th>Is Subcomment</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in comments %}
+                            <tr>
+                                <td>{{i}}</td>
+                                <td>{{i['text']}}</td>
+                                <td>{{i['user']}}</td>
+                                <td>{{i['time']}}</td>
+                                <td>{{i['likes']}}</td>
+                                <td>{{i['dislikes']}}</td>
+                                <td>{{i['is_sub']}}</td>
+                                <td>
+                                    <a href="/delete/{{identity}}/comments/{{i['_id']}}">
+                                        <button class="btn btn-default" style="color:red">x</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            <div>
+                <h2>Predict Requests</h2>
+                <table class="table table-bordered">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
