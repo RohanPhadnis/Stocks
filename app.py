@@ -55,7 +55,7 @@ def view(identity):
         elif time.time() - user[0]['time'] > LOCK:
             return redirect('/login')
         else:
-            return render_template('view.html', identity=identity, data=[])
+            return render_template('view.html', identity=identity, symbol='null', data=[])
     elif request.method == 'POST':
         form = dict(request.form)
         form['symbol'] = form['symbol'].upper()
@@ -71,7 +71,22 @@ def view(identity):
             with open('{}/data.txt'.format(form['symbol']), 'wb') as file:
                 pickle.dump(raw, file)
             data = format_data(raw)
-            return render_template('view.html', identity=identity, data=data, name=ticker.get_info()['longName'], display=False)
+            return render_template('view.html', identity=identity, symbol=form['symbol'], data=data, name=ticker.get_info()['longName'], display=False)
+
+
+@app.route('/predict/<identity>/<symbol>', methods=['GET'])
+def predict_request(identity, symbol):
+    if request.method == 'GET':
+        user = list(mongo.db.session.find({'_id': ObjectId(identity)}))
+        if len(user) == 0:
+            return redirect('/login')
+        user = user[0]
+        if time.time() - user['time'] > LOCK:
+            return redirect('/login')
+        files = os.listdir()
+        if symbol in files:
+            mongo.db.predict.insert_one({'symbol': symbol})
+        return redirect('/view/{}'.format(identity))
 
 
 @app.route('/forum/<identity>', methods=['GET', 'POST'])
@@ -134,7 +149,7 @@ def view_thread(identity, key):
         user = list(mongo.db.session.find({'_id': ObjectId(identity)}))[0]
         tf = TimeForm(time.time())
         tf = tf.cumulative()
-        obj = {'text': resp['comment'], 'user': user, 'time': time.time(), 'is_sub': False, 'subs': [], 'likes': 0, 'dislikes': 0, 'date_time': '{}-{}-{} {}:{}{}'.format(tf['month'], tf['day'], tf['year'], tf['hour'], tf['minute'], tf['clock'])}
+        obj = {'text': resp['comment'], 'user': user['user'], 'time': time.time(), 'is_sub': False, 'subs': [], 'likes': 0, 'dislikes': 0, 'date_time': '{}-{}-{} {}:{}{}'.format(tf['month'], tf['day'], tf['year'], tf['hour'], tf['minute'], tf['clock'])}
         mongo.db.comments.insert_one(obj)
         comm = list(mongo.db.comments.find(obj))[0]
         t['comments'].append(comm['_id'])
@@ -215,7 +230,26 @@ def admin(identity):
         sessions = list(mongo.db.session.find({}))
         threads = list(mongo.db.threads.find({}))
         comments = list(mongo.db.comments.find({}))
-        return render_template('admin.html', identity=identity, users=users, sessions=sessions, threads=threads, comments=comments)
+        new_comments = []
+        for i, t in enumerate(threads):
+            threads[i]['index'] = i + 1
+            c_num = 1
+            for j, comm in enumerate(t['comments']):
+                for k, comm2 in enumerate(comments):
+                    if comm2['_id'] == comm:
+                        comments[k]['index'] = c_num
+                        comments[k]['thread_index'] = i + 1
+                        new_comments.append(comments[k])
+                        c_num += 1
+                        for sub in comments[k]['subs']:
+                            for l, comm3 in enumerate(comments):
+                                if comm3['_id'] == sub:
+                                    comments[l]['index'] = c_num
+                                    comments[l]['thread_index'] = i + 1
+                                    new_comments.append(comments[l])
+                                    c_num += 1
+        pred = mongo.db.predict.find({})
+        return render_template('admin.html', identity=identity, users=users, sessions=sessions, threads=threads, comments=new_comments, predict=pred)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -236,6 +270,11 @@ def login():
                 mongo.db.session.insert_one({'user': form['user'], 'time': time.time(), 'ip': request.remote_addr, 'admin': False})
                 identity = list(mongo.db.session.find({'user': form['user']}))[0]['_id']
                 return redirect('/view/{}'.format(identity))
+
+
+@app.route('/tennis', methods=['GET'])
+def tennis():
+    return render_template('tennis.html')
 
 
 @app.route('/reg', methods=['GET', 'POST'])
@@ -273,9 +312,12 @@ def delete(identity, col, key):
                 comm_container['subs'].remove(comm['_id'])
                 mongo.db.comments.update_one({'_id': comm_container['_id']}, {'$set': {'subs': comm_container['subs']}})
                 thread = list(mongo.db.threads.find({'_id': comm_container['container']}))[0]
+                thread['comments'].remove(comm['_id'])
+                mongo.db.threads.update_one({'_id': thread['_id']}, {'$set': {'comments': thread['comments']}})
             else:
                 thread = list(mongo.db.threads.find({'_id': comm['container']}))[0]
-                # thread['comments'].remove()
+                thread['comments'].remove(comm['_id'])
+                mongo.db.threads.update_one({'_id': thread['_id']}, {'$set': {'comments': thread['comments']}})
         exec("mongo.db."+ col +".delete_one({'_id': ObjectId('" + key + "')})")
         return redirect('/admin/{}'.format(identity))
 

@@ -46,6 +46,7 @@
             {% if display %}
                 <div class="alert alert-danger">{{msg}}</div>
             {% endif %}
+            <a href="/predict/{{identity}}/{{symbol}}"><button class="btn btn-default">train predictor</button></a>
             <canvas id="chart"></canvas>
             <div>
                 <table class="table table-bordered">

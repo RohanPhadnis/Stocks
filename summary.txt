@@ -42,3 +42,13 @@ stock data object format:
 
 {index, day, month, year, open, closed, high, low}
 
+
+Improve UI/UX
+Improve JS user interactivity (real time updating without refresh) - load bar, ajax
+Build a machine learning model for stock pattern prediction
+Build a multiplayer simulator
+Build a portfolio manager
+Multi-factor authentication (OTP)
+Separate Admin Interface
+Profile page
+Payment gateway with stripe

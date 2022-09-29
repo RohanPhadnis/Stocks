@@ -1,45 +1,48 @@
-import math
-import random
+import pickle
+import matplotlib.pyplot as plt
 import numpy
 import tensorflow as tf
-from tensorflow import keras
 
-ratio = 0.75
-data = [math.sin(n) * 100 + random.random() * 10 * random.choice([-1, 1]) for n in range(10001)]
-l=[]
+with open('TSLA/data.txt', 'rb') as file:
+    data = list(dict(dict(pickle.load(file))['Open']).values())
+
+#plt.plot(data)
+#plt.show()
+
 xs = []
 ys = []
-for i in range(0, 10000, 20):
-    for j in range(i, i + 20):
-        l.append(data[j])
-    xs.append(l)
-    ys.append(data[i + 20])
-    l = []
+index = 0
+while index + 20 < len(data):
+    xs.append(data[index:index+20])
+    ys.append(data[index + 20])
+    index += 1
 
-master = [(xs[i], ys[i]) for i in range(len(xs))]
-random.shuffle(master)
-train = master[:int(len(master) * ratio)]
-train_xs = numpy.array([train[i][0] for i in range(len(train))])
-train_ys = numpy.array([train[i][1] for i in range(len(train))])
-val = master[int(len(master) * ratio):]
-val_xs =numpy.array([val[i][0] for i in range(len(val))])
-val_ys = numpy.array([val[i][1] for i in range(len(val))])
-print(train[0])
-print(train_xs[0])
-print(train_ys[0])
+xs = numpy.array(xs)
+ys = numpy.array(ys)
+print(xs[4])
+print(ys[4])
+print(xs.shape)
+print(ys.shape)
 
-model = keras.models.Sequential([
-  keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=-1), input_shape=(20,)),
-  keras.layers.Bidirectional(keras.layers.LSTM(32, return_sequences=True)),
-  keras.layers.Bidirectional(keras.layers.LSTM(16)),
-  keras.layers.Dense(units=32, activation='relu'),
-  keras.layers.Dense(units=16, activation='relu'),
-  keras.layers.Dense(1)
+model = tf.keras.models.Sequential([
+  # tf.keras.layers.Conv1D(filters=64, kernel_size=3,
+  #                     strides=1,
+  #                     activation="relu",
+  #                     padding='causal',
+  #                     input_shape=[20, 1]),
+  # tf.keras.layers.LSTM(64, return_sequences=True),
+  # tf.keras.layers.LSTM(64),
+    tf.keras.layers.Dense(20, activation="relu", input_shape=(20,)),
+    tf.keras.layers.Dense(10, activation="relu"),
+    tf.keras.layers.Dense(4, activation='relu'),
+    tf.keras.layers.Dense(1)
 ])
 
-model.compile(optimizer='sgd', loss='huber', metrics=['acc'])
-print(model.summary())
-model.fit(x=train_xs, y=train_ys, epochs=500, validation_data=(val_xs, val_ys))
 
+model.summary()
+model.compile(loss='huber', optimizer='sgd', metrics=['acc'])
+model.fit(
+    x=xs, y=ys, epochs=100, verbose=1
+)
 
-
+model.save('TSLA/model.h5')

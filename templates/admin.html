@@ -93,7 +93,7 @@
                     <tbody>
                         {% for i in threads %}
                             <tr>
-                                <td>{{i}}</td>
+                                <td>{{i['index']}}</td>
                                 <td>{{i['title']}}</td>
                                 <td>{{i['time']}}</td>
                                 <td>{{i['num']}}</td>
@@ -114,6 +114,7 @@
                     <thead>
                         <tr>
                             <th>Thread Number</th>
+                            <th>Comment Number</th>
                             <th>Text</th>
                             <th>User</th>
                             <th>Date and Time</th>
@@ -126,7 +127,8 @@
                     <tbody>
                         {% for i in comments %}
                             <tr>
-                                <td>{{i}}</td>
+                                <td>{{i['thread_index']}}</td>
+                                <td>{{i['index']}}</td>
                                 <td>{{i['text']}}</td>
                                 <td>{{i['user']}}</td>
                                 <td>{{i['time']}}</td>
@@ -147,8 +149,24 @@
             <div>
                 <h2>Predict Requests</h2>
                 <table class="table table-bordered">
-                    <thead></thead>
-                    <tbody></tbody>
+                    <thead><tr>
+                        <th>Symbol</th>
+                        <th>Train</th>
+                        <th>Delete</th>
+                    </tr></thead>
+                    <tbody>
+                        {% for i in predict %}
+                            <tr>
+                                <td>{{i['symbol']}}</td>
+                                <td><a href="/train/{{identity}}/{{i['_id']}}"><button class="btn btn-default">train</button></a></td>
+                                <td>
+                                    <a href="/delete/{{identity}}/predict/{{i['_id']}}">
+                                        <button class="btn btn-default" style="color:red">x</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
         </div>
