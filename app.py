@@ -271,12 +271,6 @@ def login():
                 identity = list(mongo.db.session.find({'user': form['user']}))[0]['_id']
                 return redirect('/view/{}'.format(identity))
 
-
-@app.route('/tennis', methods=['GET'])
-def tennis():
-    return render_template('tennis.html')
-
-
 @app.route('/reg', methods=['GET', 'POST'])
 def reg():
     if request.method == 'GET':
